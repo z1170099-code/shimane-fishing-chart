@@ -1,0 +1,30 @@
+{
+ "name": "島根半島沖 釣り場海図",
+ "short_name": "釣り場海図",
+ "lang": "ja",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#f2f5f4",
+ "theme_color": "#18293b",
+ "description": "島根半島〜隠岐海峡の水深図・釣りポイント・五海里線（GPS対応・オフライン可）",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
