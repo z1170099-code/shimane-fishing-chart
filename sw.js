@@ -1,5 +1,5 @@
 // 島根半島沖 釣り場海図: オフライン用サービスワーカー（09_build_pwa.py が生成）
-const VERSION = "81db9191099f";
+const VERSION = "b78c7ee708a5";
 const CACHE = "chart-" + VERSION;
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => {

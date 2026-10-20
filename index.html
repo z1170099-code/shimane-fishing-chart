@@ -94,6 +94,7 @@ input[type=checkbox] { accent-color: var(--magenta); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #gpxIn:focus-visible + .btn, label.btn:focus-within { outline: 2px solid var(--magenta); outline-offset: 2px; }
 .gpsmsg { margin: 0; font-size: .78rem; color: var(--ink-2); }
+.gpsmsg a { color: var(--magenta); }
 .here-dl { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 5px 10px; margin: 0; font-size: .82rem; }
 .here-dl:empty { display: none; }
 .here-dl dt { color: var(--ink-2); font-size: .76rem; padding-top: 1px; }
@@ -175,7 +176,7 @@ input[type=checkbox] { accent-color: var(--magenta); }
         <button id="gpsBtn" class="btn primary" type="button">現在地を表示</button>
         <label><input type="checkbox" id="gpsFollow" checked>地図を追従</label>
       </div>
-      <p class="gpsmsg" id="gpsMsg">端末のGPSで現在地を表示します。海の上では電波が弱いので、手元に保存したオフライン版のHTMLを使ってください。</p>
+      <p class="gpsmsg" id="gpsMsg">スマホでは<a href="https://z1170099-code.github.io/shimane-fishing-chart/" target="_blank" rel="noopener">アプリ版</a>をホーム画面に追加して使うと、GPSの現在地表示が使え、一度開けば電波がなくても動きます。</p>
       <div class="search"><input id="llIn" type="text" inputmode="text" autocomplete="off" placeholder="座標を入力（例: 35.775,133.122 ／ N35°46.5′ E133°07.3′）"><button id="llGo" type="button">表示</button></div>
       <div class="gpsrow">
         <label class="btn" for="gpxIn">GPX・CSVを読み込む</label>
