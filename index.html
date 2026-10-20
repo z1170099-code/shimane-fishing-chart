@@ -73,6 +73,23 @@ input[type=checkbox] { accent-color: var(--magenta); }
 .symkey { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .74rem; color: var(--ink-2); }
 .symkey span { display: inline-flex; align-items: center; gap: 5px; }
 .symkey .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.4); }
+.symkey .mykey { width: 9px; height: 9px; transform: rotate(45deg); background: var(--b-sand); border: 1.5px solid #18293b; }
+.mypt span { display: block; width: 13px; height: 13px; margin: 2.5px; transform: rotate(45deg); border: 2px solid #18293b; box-shadow: 0 0 0 2px #fff; }
+.mypt.sel span { border-color: #b0267a; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #b0267a; }
+.myform { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px solid var(--magenta); background: var(--sea-ui); }
+.myloc { font-family: var(--mono); font-size: .78rem; font-variant-numeric: tabular-nums; }
+.fld { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); align-items: center; gap: 8px; font-size: .82rem; }
+.fld input, .fld select { font: inherit; font-size: 16px; min-width: 0; padding: 5px 8px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); }
+.hint { margin: -4px 0 0 calc(5.5em + 8px); font-size: .72rem; color: var(--ink-2); }
+.mylist { display: flex; flex-direction: column; }
+.myrow { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto; gap: 2px 10px; padding: 8px 4px; border-top: 1px solid var(--rule); align-items: start; }
+.myrow.sel { background: var(--sea-ui); box-shadow: inset 3px 0 0 var(--magenta); }
+.myrow .id { font-family: var(--mono); font-size: .76rem; color: var(--magenta); font-weight: 500; padding-top: 2px; }
+.myrow .sp { font-weight: 700; font-size: .9rem; line-height: 1.4; }
+.myrow .meta { grid-column: 2 / 4; font-size: .74rem; color: var(--ink-2); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.myrow .acts { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 6px; }
+.myrow .acts button { font: inherit; font-size: .76rem; padding: 3px 10px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); cursor: pointer; }
+.myrow .acts button.danger { color: var(--warn); border-color: var(--warn); }
 .symkey .reefkey { width: 9px; height: 9px; border-radius: 50%; background: #fff; border: 2px solid #b0267a; }
 .symkey .net { width: 14px; height: 9px; background: rgba(110, 60, 160, .35); border: 1px solid #6e3ca0; }
 .symkey .cand { width: 14px; height: 9px; background: rgba(176, 38, 122, .12); border: 1.5px solid var(--magenta); }
@@ -181,6 +198,26 @@ input[type=checkbox] { accent-color: var(--magenta); }
         <button id="gpxClear" class="btn" type="button" hidden>読み込みを消す</button>
       </div>
       <dl id="here" class="here-dl"></dl>
+      <button id="addHere" class="btn primary" type="button" hidden>この地点をマイポイントに登録</button>
+    </section>
+    <section class="block" id="myBlock">
+      <p class="eyebrow">マイポイント</p>
+      <p class="gpsmsg" id="myMsg">現在地・入力した座標・地図を長押しして選んだ地点を、水深・底質・魚種つきで登録できます。登録した地点はこの端末の中にだけ保存されます。</p>
+      <form id="myForm" class="myform" hidden>
+        <div class="myloc" id="myLoc"></div>
+        <label class="fld" for="myDepth">水深（m）<input id="myDepth" type="number" inputmode="decimal" step="0.1" min="0" max="3000"></label>
+        <p class="hint">初期値は水深データ（ETOPO）の推定です。魚探や海図の値に書き換えてください。</p>
+        <label class="fld" for="myBottom">底質<select id="myBottom"></select></label>
+        <label class="fld" for="mySpecies">魚種<input id="mySpecies" type="text" list="spList" autocomplete="off" placeholder="例: マダイ、ヒラメ（複数は「、」で区切る）"></label>
+        <div class="gpsrow"><button class="btn primary" type="submit" id="mySave">登録する</button><button class="btn" type="button" id="myCancel">やめる</button></div>
+      </form>
+      <div class="mylist" id="myList"></div>
+      <div class="gpsrow" id="myIO">
+        <button class="btn" type="button" id="myExportGpx">GPXで書き出す</button>
+        <button class="btn" type="button" id="myExportJson">バックアップを書き出す</button>
+        <label class="btn" for="myImport">バックアップを読み込む</label>
+        <input type="file" id="myImport" accept=".json,.gpx" class="visually-hidden">
+      </div>
     </section>
     <section class="block">
       <p class="eyebrow">表示レイヤー</p>
@@ -194,6 +231,7 @@ input[type=checkbox] { accent-color: var(--magenta); }
         <label><input type="checkbox" id="lyNet" checked>定置網の区域</label>
         <label><input type="checkbox" id="lyChart">海図の等深線</label>
         <label><input type="checkbox" id="lyNm" checked>五海里線</label>
+        <label><input type="checkbox" id="lyMy" checked>マイポイント</label>
         <div class="range"><span>堆積図の濃さ</span><input type="range" id="gsjOp" min="0.2" max="1" step="0.05" value="0.7"></div>
       </div>
       <div class="symkey" aria-label="海図レイヤーの記号">
@@ -206,6 +244,7 @@ input[type=checkbox] { accent-color: var(--magenta); }
         <span><i class="cand"></i>候補範囲</span>
         <span><i class="nm"></i>五海里線</span>
         <span><i class="herekey"></i>現在地・GPX</span>
+        <span><i class="mykey"></i>マイポイント</span>
       </div>
       <p class="gpsmsg" id="denseNote">海図の底質点と魚礁は、地図を拡大すると表示されます（隠岐周辺と中海・境水道は省いています）。</p>
     </section>
@@ -456,6 +495,10 @@ input[type=checkbox] { accent-color: var(--magenta); }
   const hereEl = document.getElementById("here"), gpsMsg = document.getElementById("gpsMsg");
   const APP = window.__APP_MODE === "pwa";   // アプリ版（GitHub Pages）では 09_build_pwa.py がこの印を入れる
   if (APP) gpsMsg.textContent = "端末のGPSで現在地を表示します。一度開いたあとは、電波がなくても地図とGPSが使えます。";
+  // マイポイントを保存できるのはアプリ版とオフライン版（端末内に保存）。claude.ai の公開ページでは登録しない
+  const CAN_STORE = APP || location.protocol === "file:";
+  let myPts = [], hereState = null;
+  const addHereBtn = document.getElementById("addHere");
   const follow = document.getElementById("gpsFollow");
   let hereMarker = null, hereAcc = null;
   function showHere(la, lo, acc, src) {
@@ -464,6 +507,7 @@ input[type=checkbox] { accent-color: var(--magenta); }
       hereMarker = L.marker([la, lo], { icon: L.divIcon({ className: "here", html: "<span></span>", iconSize: [18, 18], iconAnchor: [9, 9] }), zIndexOffset: 1000, keyboard: false }).addTo(map);
     }
     hereMarker.setLatLng([la, lo]); hereAcc.setLatLng([la, lo]).setRadius(acc || 0);
+    hereState = { la, lo, acc, src };
     const z = depthAt(la, lo), dLine = lineDistM(D.fiveNm.line.geometry, la, lo);
     const inZone = polyHas(D.fiveNm.zone.geometry, la, lo);
     const zone = z !== null && z >= 0 ? ["ok", "陸上"] : z === -32768 ? ["ok", "湖・内水（平水区域）"]
@@ -479,8 +523,14 @@ input[type=checkbox] { accent-color: var(--magenta); }
       ${net ? `<dt>注意</dt><dd><span class="state warn">定置網の区域内</span><div class="conf">${esc(net.properties["所在地"])}・${esc(net.properties["営む漁業種類"])}</div></dd>` : ""}
       <dt>近い地点</dt><dd>${near.map(o => `<div><button type="button" class="near" data-id="${o.p.id}">${o.p.id} ${esc(o.p["名称"])}</button>
         <span class="conf num">${o.inside ? "候補範囲の中" : `${dirName(o.b)} ${(o.d / 1000).toFixed(1)} km`}</span></div>`).join("")}</dd>`;
-    hereEl.querySelectorAll("button.near").forEach(b => b.onclick = () => select(b.dataset.id));
+    const myNear = myPts.map(m => ({ m, d: distM([la, lo], [m.lat, m.lon]), b: bearing([la, lo], [m.lat, m.lon]) })).sort((a, b) => a.d - b.d).slice(0, 2);
+    if (myNear.length) hereEl.insertAdjacentHTML("beforeend", `<dt>マイポイント</dt><dd>${myNear.map(o => `<div><button type="button" class="near" data-my="${o.m.id}">${o.m.id} ${esc(o.m.species.join("、") || "魚種未入力")}</button>
+      <span class="conf num">${o.d < 30 ? "ここ" : `${dirName(o.b)} ${(o.d / 1000).toFixed(2)} km`}</span></div>`).join("")}</dd>`);
+    hereEl.querySelectorAll("button.near").forEach(b => b.onclick = () => b.dataset.my ? focusMy(b.dataset.my) : select(b.dataset.id));
+    addHereBtn.hidden = !CAN_STORE;
   }
+  // 地図を長押し（パソコンでは右クリック）して地点を選ぶ
+  map.on("contextmenu", e => { showHere(e.latlng.lat, e.latlng.lng, 0, "地図で選んだ地点"); gpsMsg.textContent = "地図で選んだ地点を表示しました。"; });
 
   // 端末のGPS（ブラウザの位置情報）
   const gpsBtn = document.getElementById("gpsBtn");
@@ -576,10 +626,170 @@ input[type=checkbox] { accent-color: var(--magenta); }
   gpxClear.onclick = () => { trackLayer.clearLayers(); gpxClear.hidden = true; gpsMsg.textContent = "読み込んだ地点・軌跡を消しました。"; try { localStorage.removeItem("track"); } catch (e) {} };
   try { const t = JSON.parse(localStorage.getItem("track") || "null"); if (t) loadTrack(t.text, t.name); } catch (e) {}
 
+  // ---- マイポイント（自分で登録する地点。端末の中にだけ保存する）
+  const MY_KEY = "myPoints.v1";
+  const myLayer = L.layerGroup().addTo(map);
+  const myForm = document.getElementById("myForm"), myList = document.getElementById("myList"), myMsg = document.getElementById("myMsg");
+  const myDepth = document.getElementById("myDepth"), myBottom = document.getElementById("myBottom"), mySpecies = document.getElementById("mySpecies");
+  let editing = null, draft = null, mySel = null;
+  myBottom.innerHTML = BOTTOMS.map(([k]) => `<option value="${k}">${k}</option>`).join("");
+  myBottom.value = "不明";
+  const splitSp = s => String(s || "").split(/[、,，;；\/／\s]+/).map(x => x.trim()).filter(Boolean);
+  function loadMy() {
+    try { const a = JSON.parse(localStorage.getItem(MY_KEY) || "[]"); return Array.isArray(a) ? a.filter(m => isFinite(m.lat) && isFinite(m.lon)) : []; }
+    catch (e) { return []; }
+  }
+  function saveMy() {
+    try { localStorage.setItem(MY_KEY, JSON.stringify(myPts)); return true; }
+    catch (e) { myMsg.textContent = "端末に保存できませんでした。ブラウザの保存領域がいっぱいか、保存が禁止されています。バックアップを書き出しておいてください。"; return false; }
+  }
+  // 番号は一度使ったら再利用しない（書き出したGPXの番号と食い違わないように）
+  function nextId() {
+    let seq = 0; try { seq = +localStorage.getItem("myPoints.seq") || 0; } catch (e) {}
+    const n = Math.max(seq, myPts.reduce((a, m) => Math.max(a, parseInt(String(m.id).slice(1)) || 0), 0)) + 1;
+    try { localStorage.setItem("myPoints.seq", String(n)); } catch (e) {}
+    return "M" + n;
+  }
+  const depthStr = m => (m.depth === null || m.depth === "" || !isFinite(m.depth)) ? "水深未入力" : `水深 ${+m.depth} m`;
+  const dateStr = s => { try { return new Date(s).toLocaleDateString("ja-JP"); } catch (e) { return ""; } };
+
+  function openForm(pt, existing) {
+    editing = existing ? existing.id : null; draft = pt;
+    const z = depthAt(pt.lat, pt.lon);
+    myDepth.value = existing ? (existing.depth ?? "") : (z !== null && z < 0 && z !== -32768 ? -z : "");
+    myBottom.value = existing ? existing.bottom : "不明";
+    mySpecies.value = existing ? existing.species.join("、") : "";
+    document.getElementById("myLoc").textContent = `${existing ? existing.id + " を編集" : "新しい地点"}: ${dmStr(pt.lat, "N", "S")} ${dmStr(pt.lon, "E", "W")}（${pt.src}${pt.acc ? ` ±${Math.round(pt.acc)} m` : ""}）`;
+    document.getElementById("mySave").textContent = existing ? "変更を保存" : "登録する";
+    myForm.hidden = false;
+    myForm.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    mySpecies.focus({ preventScroll: true });
+  }
+  addHereBtn.onclick = () => { if (hereState) openForm({ lat: hereState.la, lon: hereState.lo, acc: hereState.acc, src: hereState.src }); };
+  document.getElementById("myCancel").onclick = () => { myForm.hidden = true; editing = null; draft = null; };
+  myForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const dv = myDepth.value.trim(), depth = dv === "" ? null : Math.round(parseFloat(dv) * 10) / 10;
+    if (dv !== "" && !(depth >= 0 && depth <= 3000)) { myMsg.textContent = "水深は 0〜3000 の数字（m）で入れてください。"; myDepth.focus(); return; }
+    const rec = { bottom: myBottom.value, species: splitSp(mySpecies.value), depth };
+    let id;
+    if (editing) { const m = myPts.find(x => x.id === editing); Object.assign(m, rec, { updated: new Date().toISOString() }); id = m.id; }
+    else {
+      id = nextId();
+      myPts.push({ id, lat: +draft.lat.toFixed(6), lon: +draft.lon.toFixed(6), ...rec, src: draft.src, acc: draft.acc ? Math.round(draft.acc) : null, created: new Date().toISOString() });
+    }
+    if (!saveMy()) return;
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (err) {}   // 端末が勝手に消さないよう頼む
+    myForm.hidden = true; editing = null; draft = null;
+    myMsg.textContent = `${id} を保存しました（全 ${myPts.length} 地点）。`;
+    renderMy(); focusMy(id, false);
+  });
+
+  function renderMy() {
+    myLayer.clearLayers();
+    myPts.forEach(m => {
+      const key = BOTTOMS.some(b => b[0] === m.bottom) ? m.bottom : "不明";
+      L.marker([m.lat, m.lon], { keyboard: false, zIndexOffset: 500,
+        icon: L.divIcon({ className: "mypt" + (m.id === mySel ? " sel" : ""), html: `<span style="background:${color(key)}"></span>`, iconSize: [18, 18], iconAnchor: [9, 9] }) })
+        .bindTooltip(m.id, { permanent: true, direction: "right", offset: [8, 0], className: "pt-label" })
+        .on("click", () => focusMy(m.id, false)).addTo(myLayer);
+    });
+    const sorted = [...myPts].sort((a, b) => (b.created || "").localeCompare(a.created || ""));
+    myList.innerHTML = sorted.map(m => `
+      <div class="myrow${m.id === mySel ? " sel" : ""}" data-id="${m.id}">
+        <span class="id">${m.id}</span><span class="sp">${esc(m.species.join("、") || "魚種未入力")}</span>
+        <span>${pill({ key: BOTTOMS.some(b => b[0] === m.bottom) ? m.bottom : "不明", "底質_推定": m.bottom })}</span>
+        <span class="meta">${esc(depthStr(m))} ・ ${dmStr(m.lat, "N", "S")} ${dmStr(m.lon, "E", "W")} ・ ${esc(dateStr(m.created))}</span>
+        <span class="acts"><button type="button" data-act="show">地図で見る</button><button type="button" data-act="edit">編集</button><button type="button" data-act="del">削除</button></span>
+      </div>`).join("") || (CAN_STORE ? `<p class="empty">まだ登録がありません。上の「現在地を表示」や座標入力、地図の長押しで地点を選び、「この地点をマイポイントに登録」を押してください。</p>` : "");
+    myList.querySelectorAll(".myrow").forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('[data-act="show"]').onclick = () => focusMy(id);
+      row.querySelector('[data-act="edit"]').onclick = () => { const m = myPts.find(x => x.id === id); openForm({ lat: m.lat, lon: m.lon, acc: m.acc, src: m.src || "登録済み" }, m); };
+      const del = row.querySelector('[data-act="del"]');
+      del.onclick = () => {   // 確認ダイアログは使えない環境があるので、2回押しで削除
+        if (del.dataset.armed) {
+          myPts = myPts.filter(x => x.id !== id); saveMy(); if (mySel === id) mySel = null;
+          myMsg.textContent = `${id} を削除しました。`; renderMy(); return;
+        }
+        del.dataset.armed = "1"; del.textContent = "もう一度押すと削除"; del.classList.add("danger");
+        setTimeout(() => { if (del.isConnected) { delete del.dataset.armed; del.textContent = "削除"; del.classList.remove("danger"); } }, 4000);
+      };
+    });
+    const sp = new Set([...allSp, ...myPts.flatMap(m => m.species)]);
+    document.getElementById("spList").innerHTML = [...sp].sort((a, b) => a.localeCompare(b, "ja")).map(s => `<option value="${esc(s)}">`).join("");
+  }
+  function focusMy(id, fly = true) {
+    const m = myPts.find(x => x.id === id); if (!m) return;
+    mySel = id; renderMy();
+    if (fly) map.flyTo([m.lat, m.lon], Math.max(map.getZoom(), 12), { duration: matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 0.6 });
+    showHere(m.lat, m.lon, 0, `マイポイント ${m.id}`);
+    addHereBtn.hidden = true;
+  }
+
+  // 書き出し・読み込み（機種変更やデータ消去に備えて。GPXはGPS機器・魚探・地図アプリでも開ける）
+  function saveFile(name, text, type) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  const stamp = () => new Date().toISOString().slice(0, 10);
+  const xmlEsc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" }[c]));
+  document.getElementById("myExportGpx").onclick = () => {
+    if (!myPts.length) { myMsg.textContent = "書き出す地点がありません。"; return; }
+    const w = myPts.map(m => `  <wpt lat="${m.lat}" lon="${m.lon}">${m.created ? `<time>${m.created}</time>` : ""}<name>${xmlEsc(m.id + " " + (m.species.join("、") || "魚種未入力"))}</name><desc>${xmlEsc(`底質: ${m.bottom} / ${depthStr(m)} / 魚種: ${m.species.join("、")}`)}</desc></wpt>`).join("\n");
+    saveFile(`mypoints_${stamp()}.gpx`, `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="島根半島沖 釣り場海図" xmlns="http://www.topografix.com/GPX/1/1">\n${w}\n</gpx>\n`, "application/gpx+xml");
+    myMsg.textContent = `${myPts.length} 地点をGPXで書き出しました。`;
+  };
+  document.getElementById("myExportJson").onclick = () => {
+    if (!myPts.length) { myMsg.textContent = "書き出す地点がありません。"; return; }
+    saveFile(`mypoints_backup_${stamp()}.json`, JSON.stringify({ app: "shimane-fishing-chart", version: 1, exported: new Date().toISOString(), points: myPts }, null, 1), "application/json");
+    myMsg.textContent = `${myPts.length} 地点のバックアップを書き出しました。`;
+  };
+  document.getElementById("myImport").addEventListener("change", e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      let incoming = [];
+      const text = String(r.result);
+      try {
+        if (/<gpx[\s>]/i.test(text)) {
+          new DOMParser().parseFromString(text, "application/xml").querySelectorAll("wpt").forEach(w => {
+            const desc = (w.querySelector("desc") || {}).textContent || "", name = (w.querySelector("name") || {}).textContent || "";
+            const bm = desc.match(/底質[:：]\s*([^/／]+)/), dm = desc.match(/水深\s*([\d.]+)\s*m/), sm = desc.match(/魚種[:：]\s*(.*)$/);
+            incoming.push({ lat: +w.getAttribute("lat"), lon: +w.getAttribute("lon"), bottom: bm ? bm[1].trim() : "不明",
+              depth: dm ? +dm[1] : null, species: sm ? splitSp(sm[1]) : splitSp(name.replace(/^M\d+\s*/, "")),
+              src: `読み込み（${f.name}）`, created: (w.querySelector("time") || {}).textContent || new Date().toISOString() });
+          });
+        } else {
+          const j = JSON.parse(text); incoming = (Array.isArray(j) ? j : j.points || []).map(m => ({ ...m, species: Array.isArray(m.species) ? m.species : splitSp(m.species) }));
+        }
+      } catch (err) { myMsg.textContent = "読み込めませんでした。このアプリで書き出したバックアップ（.json）かGPXを選んでください。"; return; }
+      // 同じ場所（約10m以内）・同じ内容の地点は重複とみなして足さない
+      let added = 0;
+      incoming.filter(m => isFinite(m.lat) && isFinite(m.lon)).forEach(m => {
+        const dup = myPts.some(x => distM([x.lat, x.lon], [m.lat, m.lon]) < 10 && x.bottom === m.bottom && x.species.join() === m.species.join());
+        if (dup) return;
+        myPts.push({ id: nextId(), lat: +(+m.lat).toFixed(6), lon: +(+m.lon).toFixed(6), bottom: BOTTOMS.some(b => b[0] === m.bottom) ? m.bottom : "不明",
+          species: m.species || [], depth: m.depth ?? null, src: m.src || `読み込み（${f.name}）`, acc: m.acc ?? null, created: m.created || new Date().toISOString() });
+        added++;
+      });
+      if (saveMy()) myMsg.textContent = `${f.name} から ${added} 地点を追加しました（重複 ${incoming.length - added} 件は追加していません）。`;
+      renderMy();
+    };
+    r.readAsText(f); e.target.value = "";
+  });
+
+  if (CAN_STORE) { myPts = loadMy(); renderMy(); }
+  else {
+    myMsg.innerHTML = `マイポイントの登録は<a href="https://z1170099-code.github.io/shimane-fishing-chart/" target="_blank" rel="noopener">アプリ版</a>で使えます（登録した地点はその端末の中に保存されます）。このページでは登録できません。`;
+    document.getElementById("myIO").hidden = true;
+  }
+
   // ---- レイヤー切り替え
   const tog = (id, layer) => document.getElementById(id).addEventListener("change", e => e.target.checked ? layer.addTo(map) : map.removeLayer(layer));
   tog("lyBathy", bathy); tog("lyCont", cont); tog("lyGsj", gsj); tog("lyErr", errs);
-  tog("lyNet", nets); tog("lyChart", chartCont); tog("lyNm", nmLayer);
+  tog("lyNet", nets); tog("lyChart", chartCont); tog("lyNm", nmLayer); tog("lyMy", myLayer);
   const denseNote = document.getElementById("denseNote");
   function syncDense() {
     const zoomOk = map.getZoom() >= DENSE_Z;
