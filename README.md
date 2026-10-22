@@ -11,7 +11,7 @@
 - 底質・魚礁・等深線（電子海図由来）、定置漁業権（2024年度）: 海上保安庁「海洋状況表示システム（海しる）」
   - このサービスは、海しるAPIを利用して取得した情報をもとに作成しているが、サービスの内容は海上保安庁によって保証されたものではない。
 - 表層堆積図: 産業技術総合研究所 地質調査総合センター「隠岐海峡表層堆積図」(2010)（政府標準利用規約2.0）を加工して作成
-- 五海里線: © OpenStreetMap contributors の海岸線（natural=coastline）から計算。五海里線のデータは [ODbL](https://opendatacommons.org/licenses/odbl/) で提供します。
+- 陸地・湖の形と五海里線: © OpenStreetMap contributors の海岸線（natural=coastline）・湖（natural=water）から作成。これらのデータは [ODbL](https://opendatacommons.org/licenses/odbl/) で提供します。
 - 釣りポイント: 各地点の詳細欄に記載した釣果記事・船宿の案内・県や環境省の資料をもとに推定
 
 いずれも出典の情報を加工して作成したもので、各提供者が作成したものではありません。
